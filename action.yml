@@ -1,5 +1,5 @@
-name: 'xcodegen'
-description: 'Installs the `xcodegen` tool'
+name: 'setup-xcodegen'
+description: 'Installs the xcodegen tool and enables cache'
 inputs:
   enable-cache:
     description: 'Cache or not the installation'
