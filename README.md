@@ -14,7 +14,7 @@ A GitHub Action Wrapper for the delightful [`xcodegen`][https://github.com/yonas
 ## Example usage
 
 ```yaml
-uses: nightstory/setup-xcodegen@1.0.0
+uses: nightstory/setup-xcodegen@v1
 with:
   enable-cache: true
   version: latest
