@@ -6,7 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["github", "actions", "github actions", "xcodegen", "xcode", "ios"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nightstory/setup-xcodegen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nightstory/setup-xcodegen/issues"
+  },
+  "homepage": "https://github.com/nightstory/setup-xcodegen#readme",
   "author": "",
   "license": "ISC",
   "dependencies": {
