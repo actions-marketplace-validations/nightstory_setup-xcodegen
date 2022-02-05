@@ -16,9 +16,9 @@ async function installXcodegen () {
   const cacheKey = 'setup-xcodegen-cache-key'
 
   if (core.getInput('enable-cache') === 'true') {
-    await cache.restoreCache([xcodegenDirBin], cacheKey)
+    const restored = await cache.restoreCache([xcodegenDirBin], cacheKey)
 
-    if (isXcodegenAvailable()) {
+    if (restored) {
       core.info('🎉 xcodegen available from cache!')
     } else {
       await downloadInstallXcodegen(xcodegenDir, xcodegenDirBin)
@@ -31,13 +31,7 @@ async function installXcodegen () {
     await downloadInstallXcodegen(xcodegenDir, xcodegenDirBin)
   }
 
-  if (!isXcodegenAvailable()) {
-    core.addPath(xcodegenDirBin)
-  }
-
-  if (!isXcodegenAvailable()) {
-    core.setFailed('❌ xcodegen is still not accessible, please contact action maintainers!')
-  }
+  core.addPath(xcodegenDirBin)
 }
 
 function isXcodegenAvailable () {
