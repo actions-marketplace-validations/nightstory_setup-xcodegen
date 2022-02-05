@@ -1,5 +1,7 @@
 name: 'setup-xcodegen'
 description: 'Installs the xcodegen tool and enables cache'
+icon: briefcase
+color: blue
 inputs:
   enable-cache:
     description: 'Cache or not the installation'
