@@ -1,16 +1,53 @@
 const core = require('@actions/core')
 const exec = require('@actions/exec')
+const cache = require('@actions/cache')
 const os = require('os')
+const shell = require('shelljs');
 
 try {
   main()
 } catch (error) {
-  core.setFailed(error.message);
+  core.setFailed(error.message)
 }
 
-async function installXcodegen() {
-  const xcodegenDir = os.homedir() + '/action-xcodegen/'
-  const zipFile = xcodegenDir + 'xcodegen.zip'
+async function installXcodegen () {
+  const xcodegenDir = os.homedir() + '/setup-xcodegen/'
+  const xcodegenDirBin = os.homedir() + '/setup-xcodegen-bin/'
+  const cacheKey = 'setup-xcodegen-cache-key'
+
+  if (core.getInput('enable-cache') === 'true') {
+    await cache.restoreCache([xcodegenDirBin], cacheKey)
+
+    if (isXcodegenAvailable()) {
+      core.info('🎉 xcodegen available from cache!')
+    } else {
+      await downloadInstallXcodegen(xcodegenDir, xcodegenDirBin)
+
+      core.info('📦 xcodegen is being added to cache...')
+      await cache.saveCache([xcodegenDirBin], cacheKey)
+      core.info('✅ xcodegen is cached successfully!')
+    }
+  } else {
+    await downloadInstallXcodegen(xcodegenDir, xcodegenDirBin)
+  }
+
+  if (!isXcodegenAvailable()) {
+    core.addPath(xcodegenDirBin)
+  }
+
+  if (!isXcodegenAvailable()) {
+    core.setFailed('❌ xcodegen is still not accessible, please contact action maintainers!')
+  }
+}
+
+function isXcodegenAvailable () {
+  return shell.which('xcodegen')
+}
+
+async function downloadInstallXcodegen(downloadDir, binDir) {
+  core.info('⌛ xcodegen is installing...')
+
+  const zipFile = downloadDir + 'xcodegen.zip'
   const version = core.getInput('version')
   const url = version === 'latest'
     ? 'https://github.com/yonaskolb/XcodeGen/releases/latest/download/xcodegen.zip'
@@ -23,60 +60,14 @@ async function installXcodegen() {
     zipFile,
     url
   ])
-  await exec.exec('unzip', ['-q', '-o', zipFile], { cwd: xcodegenDir })
+  await exec.exec('unzip', ['-q', '-o', zipFile], {cwd: downloadDir})
   await exec.exec('rm', [zipFile])
-  await exec.exec('xcodegen/install.sh', null, { cwd: xcodegenDir })
-  await exec.exec('rm -rf', [xcodegenDir])
+  await exec.exec('xcodegen/install.sh', [binDir], {cwd: downloadDir})
+  await exec.exec('rm -rf', [downloadDir])
+
+  core.info('✅ xcodegen is installed!')
 }
 
-async function runXcodegen() {
-  const input = {
-    cachePath:  core.getInput('cache-path'),
-    noEnv:      core.getInput('no-env'),
-    onlyPlists: core.getInput('only-plists'),
-    project:    core.getInput('project'),
-    quiet:      core.getInput('quiet'),
-    spec:       core.getInput('spec'),
-    useCache:   core.getInput('use-cache')
-  }
-
-  let options = []
-
-  if (input.cachePath) {
-    options.push('--cache-path')
-    options.push(input.cachePath)
-  }
-
-  if (input.noEnv) {
-    options.push('--no-env')
-  }
-
-  if (input.onlyPlists) {
-    options.push('--only-plists')
-  }
-
-  if (input.project) {
-    options.push('--project')
-    options.push(input.project)
-  }
-
-  if (input.quiet) {
-    options.push('--quiet')
-  }
-
-  if (input.spec) {
-    options.push('--spec')
-    options.push(input.spec)
-  }
-
-  if (input.useCache) {
-    options.push('--use-cache')
-  }
-
-  await exec.exec('xcodegen', options)
-}
- 
-async function main() {
+async function main () {
   await installXcodegen()
-  await runXcodegen()  
 }

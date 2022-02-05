@@ -1,23 +1,14 @@
 name: 'xcodegen'
-description: 'Runs the `xcodegen generate` command'
+description: 'Installs the `xcodegen` tool'
 inputs:
-  cache-path:
-    description: 'Where the cache file will be loaded from and save to. Defaults to ~/.xcodegen/cache/{SPEC_PATH_HASH}'
-  no-env:
-    description: 'Disable environment variable expansions'
-  only-plists:
-    description: 'Generate only plist files'
-  project:
-    description: 'The path to the directory where the project should be generated. Defaults to the directory the spec is in. The filename is defined in the project spec'
-  quiet:
-    description: 'Suppress all informational and success output'
-  spec:
-    description: 'The path to the project spec file. Defaults to project.yml'
-  use-cache:
-    description: 'Use a cache for the xcodegen spec. This will prevent unnecessarily generating the project if nothing has changed'
+  enable-cache:
+    description: 'Cache or not the installation'
+    default: 'true'
+    required: false
   version:
     description: 'The version of xcodegen to be used. Check https://github.com/yonaskolb/XcodeGen/releases for valid options.'
     default: latest
+    required: false
 runs:
   using: 'node12'
   main: 'index.js'
